@@ -1,0 +1,55 @@
+[gd_scene load_steps=10 format=3 uid="uid://cxnu7iiixs1nt"]
+
+[ext_resource type="Texture2D" uid="uid://cecatqtww278h" path="res://Assets/hdris/kloofendal_48d_partly_cloudy_puresky_2k.hdr" id="1_vsag7"]
+[ext_resource type="Texture2D" uid="uid://bxdy7i8j4qck2" path="res://Assets/textures/dev/grids/Dark/texture_07.png" id="2_b1lip"]
+[ext_resource type="PackedScene" uid="uid://canven5x1rhlm" path="res://Scenes/player.tscn" id="3_kp5uw"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_1ombb"]
+panorama = ExtResource("1_vsag7")
+
+[sub_resource type="Sky" id="Sky_6pqip"]
+sky_material = SubResource("PanoramaSkyMaterial_1ombb")
+
+[sub_resource type="Environment" id="Environment_5bvvg"]
+background_mode = 2
+sky = SubResource("Sky_6pqip")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_l0lg2"]
+size = Vector2(100, 100)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4agfu"]
+albedo_texture = ExtResource("2_b1lip")
+uv1_triplanar = true
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_avski"]
+data = PackedVector3Array(50, 0, 50, -50, 0, 50, 50, 0, -50, -50, 0, 50, -50, 0, -50, 50, 0, -50)
+
+[node name="World" type="Node3D"]
+
+[node name="Env" type="Node3D" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Env"]
+environment = SubResource("Environment_5bvvg")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Env"]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="PlaneMesh" type="MeshInstance3D" parent="Terrain"]
+mesh = SubResource("PlaneMesh_l0lg2")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_4agfu")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Terrain/PlaneMesh"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/PlaneMesh/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_avski")
+
+[node name="Player" parent="." instance=ExtResource("3_kp5uw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
+
+[node name="MapCamera" type="Camera3D" parent="."]
